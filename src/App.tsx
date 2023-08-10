@@ -3,10 +3,10 @@ import { styled } from "styled-components";
 import Todo from "./Todo";
 
 function App() {
-  const nextId = useRef(1);
   const todoRef = useRef<Props[] | null>(null);
   const [todos, setTodos] = useState<Props[]>([]);
   const [value, setValue] = useState<string>("");
+  const nextId = useRef(1);
 
   const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setValue(target.value);
@@ -55,6 +55,7 @@ function App() {
       if (!getData) return;
       const initTodos: Props[] = JSON.parse(getData);
       setTodos(initTodos);
+      nextId.current = todos.length + 1;
     } catch (e) {
       console.log(e);
     }
