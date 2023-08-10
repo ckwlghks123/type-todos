@@ -17,12 +17,17 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(todoRef.current));
   };
 
+  const saveId = (id: number) => {
+    localStorage.setItem("nextId", JSON.stringify(id));
+  };
+
   const regTodo = () => {
     nextId.current += 1;
     const newTodo = [...todos, { id: nextId.current, todo: value }];
     setTodos(newTodo);
     setValue("");
     saveStorage(newTodo);
+    saveId(nextId.current);
   };
 
   const handleKeydown = (e: React.KeyboardEvent) => {
@@ -51,11 +56,13 @@ function App() {
 
   useEffect(() => {
     try {
+      const savedId = localStorage.getItem("nextId");
       const getData = localStorage.getItem("todos");
       if (!getData) return;
+      if (!savedId) return;
       const initTodos: Props[] = JSON.parse(getData);
+      nextId.current = JSON.parse(savedId);
       setTodos(initTodos);
-      nextId.current = todos.length + 1;
     } catch (e) {
       console.log(e);
     }
