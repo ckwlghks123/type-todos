@@ -14,7 +14,7 @@ function App() {
 
   const saveStorage = (newTodos: Props[]) => {
     todoRef.current = newTodos;
-    localStorage.setItem("todos", JSON.stringify(newTodos));
+    localStorage.setItem("todos", JSON.stringify(todoRef.current));
   };
 
   const regTodo = () => {
@@ -50,10 +50,10 @@ function App() {
   };
 
   useEffect(() => {
-    const getData = localStorage.getItem("todos");
-    if (!getData) return;
-    const initTodos: Props[] = JSON.parse(getData);
     try {
+      const getData = localStorage.getItem("todos");
+      if (!getData) return;
+      const initTodos: Props[] = JSON.parse(getData);
       setTodos(initTodos);
     } catch (e) {
       console.log(e);
