@@ -3,19 +3,18 @@ import { styled } from "styled-components";
 import Todo from "./Todo";
 
 function App() {
-  // const todoRef = useRef<Props[] | null>(null);
-  const [todos, setTodos] = useState<Props[]>([]);
+  const [todos, setTodos] = useState<Props[]>(() => {
+    const getData = localStorage.getItem("todos");
+    if (!getData) return [];
+    return JSON.parse(getData);
+  });
+
   const [value, setValue] = useState<string>("");
-  const nextId = useRef(1);
+  const nextId = useRef(todos.length);
 
   const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setValue(target.value);
   };
-
-  // const saveStorage = (newTodos: Props[]) => {
-  //   todoRef.current = newTodos;
-  //   localStorage.setItem("todos", JSON.stringify(todoRef.current));
-  // };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,13 +22,11 @@ function App() {
     const newTodo = [...todos, { id: nextId.current, todo: value }];
     setTodos(newTodo);
     setValue("");
-    // saveStorage(newTodo);
   };
 
   const handleDelete = (id: number) => {
     const newTodo = todos.filter((todo) => todo.id !== id);
     setTodos(newTodo);
-    // saveStorage(newTodo);
   };
 
   const handleModify = (id: number, todoText: string) => {
@@ -37,27 +34,21 @@ function App() {
       todo.id !== id ? todo : { id, todo: todoText }
     );
     setTodos(modifiedTodo);
-    // saveStorage(modifiedTodo);
   };
 
   useEffect(() => {
-    try {
-      const getData = localStorage.getItem("todos");
-      if (!getData) return;
-      const initTodos: Props[] = JSON.parse(getData);
-      if (initTodos.length > 0) {
-        nextId.current = initTodos.length + 1;
-        setTodos(initTodos);
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    // console.log("컴포넌트 마운트");
+    // const getData = localStorage.getItem("todos");
+    // if (!getData) return;
+    // const initTodos: Props[] = JSON.parse(getData);
+    // if (initTodos.length > 0) {
+    //   setTodos(initTodos);
+    // }
   }, []);
 
   useEffect(() => {
-    console.log("로컬스토리지 저장", todos);
     localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos, setTodos]);
+  }, [todos]);
 
   return (
     <>
