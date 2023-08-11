@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import Todo from "./Todo";
 
 function App() {
-  const todoRef = useRef<Props[] | null>(null);
+  // const todoRef = useRef<Props[] | null>(null);
   const [todos, setTodos] = useState<Props[]>([]);
   const [value, setValue] = useState<string>("");
   const nextId = useRef(1);
@@ -12,38 +12,24 @@ function App() {
     setValue(target.value);
   };
 
-  const saveStorage = (newTodos: Props[]) => {
-    todoRef.current = newTodos;
-    localStorage.setItem("todos", JSON.stringify(todoRef.current));
-  };
+  // const saveStorage = (newTodos: Props[]) => {
+  //   todoRef.current = newTodos;
+  //   localStorage.setItem("todos", JSON.stringify(todoRef.current));
+  // };
 
-  const saveId = (id: number) => {
-    localStorage.setItem("nextId", JSON.stringify(id));
-  };
-
-  const regTodo = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     nextId.current += 1;
     const newTodo = [...todos, { id: nextId.current, todo: value }];
     setTodos(newTodo);
     setValue("");
-    saveStorage(newTodo);
-    saveId(nextId.current);
-  };
-
-  const handleKeydown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && value.trim() !== "") {
-      regTodo();
-    }
-  };
-
-  const handleClick = () => {
-    regTodo();
+    // saveStorage(newTodo);
   };
 
   const handleDelete = (id: number) => {
     const newTodo = todos.filter((todo) => todo.id !== id);
     setTodos(newTodo);
-    saveStorage(newTodo);
+    // saveStorage(newTodo);
   };
 
   const handleModify = (id: number, todoText: string) => {
@@ -51,32 +37,33 @@ function App() {
       todo.id !== id ? todo : { id, todo: todoText }
     );
     setTodos(modifiedTodo);
-    saveStorage(modifiedTodo);
+    // saveStorage(modifiedTodo);
   };
 
   useEffect(() => {
     try {
-      const savedId = localStorage.getItem("nextId");
       const getData = localStorage.getItem("todos");
       if (!getData) return;
-      if (!savedId) return;
       const initTodos: Props[] = JSON.parse(getData);
-      nextId.current = JSON.parse(savedId);
-      setTodos(initTodos);
+      if (initTodos.length > 0) {
+        nextId.current = initTodos.length + 1;
+        setTodos(initTodos);
+      }
     } catch (e) {
       console.log(e);
     }
   }, []);
 
+  useEffect(() => {
+    console.log("로컬스토리지 저장", todos);
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos, setTodos]);
+
   return (
     <>
-      <StatusBoard>
-        <TodoInput
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKeydown}
-        />
-        <SubmitBtn onClick={handleClick}>제출</SubmitBtn>
+      <StatusBoard onSubmit={handleSubmit}>
+        <TodoInput value={value} onChange={handleChange} />
+        <SubmitBtn type="submit">제출</SubmitBtn>
       </StatusBoard>
       <TodosUl>
         {todos?.map(({ id, todo }) => (
@@ -95,7 +82,7 @@ function App() {
 
 export default App;
 
-const StatusBoard = styled.header`
+const StatusBoard = styled.form`
   display: flex;
   justify-content: center;
   margin-bottom: 50px;
